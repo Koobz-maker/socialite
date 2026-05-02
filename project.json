@@ -1,0 +1,25 @@
+{
+  "overview": "A full-featured social media platform combining the best of Instagram and Twitter. Users can share photos and text posts, follow friends, explore trending content, and stay connected through a real-time notifications system — all in a clean, modern, mobile-friendly interface.",
+  "features": [
+    "User sign up, login, and profile management with bio and avatar",
+    "Home feed showing posts from followed users in reverse chronological order",
+    "Photo and text post creation with likes and comments",
+    "Follow/unfollow users with follower and following counts",
+    "Public user profiles with post grid, viewable without login",
+    "Explore page with trending posts and suggested users to follow",
+    "Notifications for likes, comments, and new followers — badge in nav and dedicated page",
+    "Mobile-responsive layout with hamburger nav on small screens"
+  ],
+  "category": "social",
+  "tags": [
+    "social-media",
+    "photo-sharing",
+    "feed",
+    "follow",
+    "explore",
+    "notifications",
+    "profiles",
+    "mobile-friendly"
+  ],
+  "last_updated": "2026-05-01T15:27:19.834Z"
+}

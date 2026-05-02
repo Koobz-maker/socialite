@@ -1,0 +1,210 @@
+type _ImmutableObjectStorageRefillResult = 
+ record {
+   success: opt bool;
+   topped_up_amount: opt nat;
+ };
+type _ImmutableObjectStorageRefillInformation = record {
+                                                  proposed_top_up_amount:
+                                                   opt nat;};
+type _ImmutableObjectStorageCreateCertificateResult = 
+ record {
+   blob_hash: text;
+   method: text;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserProfile = 
+ record {
+   avatarBlob: opt ExternalBlob;
+   bio: text;
+   displayName: text;
+   username: text;
+ };
+type UserId = principal;
+type Timestamp = int;
+type ProfileInput = 
+ record {
+   avatarBlob: opt ExternalBlob;
+   bio: text;
+   displayName: text;
+   username: text;
+ };
+type Profile = 
+ record {
+   avatarBlob: opt ExternalBlob;
+   bio: text;
+   createdAt: Timestamp;
+   displayName: text;
+   followerCount: nat;
+   followingCount: nat;
+   postCount: nat;
+   "principal": UserId;
+   username: text;
+ };
+type PostInput = 
+ record {
+   caption: text;
+   photoBlob: opt ExternalBlob;
+ };
+type PostId = nat;
+type Post = 
+ record {
+   authorPrincipal: UserId;
+   caption: text;
+   commentCount: nat;
+   createdAt: Timestamp;
+   id: PostId;
+   likeCount: nat;
+   photoBlob: opt ExternalBlob;
+ };
+type Page_4 = 
+ record {
+   items: vec UserId;
+   nextOffset: opt nat;
+   total: nat;
+ };
+type Page_3 = 
+ record {
+   items: vec Notification;
+   nextOffset: opt nat;
+   total: nat;
+ };
+type Page_2 = 
+ record {
+   items: vec Comment;
+   nextOffset: opt nat;
+   total: nat;
+ };
+type Page_1 = 
+ record {
+   items: vec Post;
+   nextOffset: opt nat;
+   total: nat;
+ };
+type Page = 
+ record {
+   items: vec Profile;
+   nextOffset: opt nat;
+   total: nat;
+ };
+type NotificationType = 
+ variant {
+   comment;
+   like;
+   newFollower;
+ };
+type NotificationId = nat;
+type Notification = 
+ record {
+   createdAt: Timestamp;
+   fromPrincipal: UserId;
+   id: NotificationId;
+   notifType: NotificationType;
+   postId: opt PostId;
+   read: bool;
+ };
+type FollowRequestStatus = 
+ variant {
+   approved;
+   declined;
+   pending;
+ };
+type FollowRequest = 
+ record {
+   createdAt: Timestamp;
+   from: UserId;
+   id: nat;
+   status: FollowRequestStatus;
+   to: UserId;
+ };
+type ExternalBlob = blob;
+type DirectMessageView = 
+ record {
+   createdAt: Timestamp;
+   from: UserId;
+   id: nat;
+   readByRecipient: bool;
+   "text": text;
+   to: UserId;
+ };
+type ConversationPreview = 
+ record {
+   lastMessage: DirectMessageView;
+   partner: UserId;
+   unreadCount: nat;
+ };
+type CommentId = nat;
+type Comment = 
+ record {
+   authorPrincipal: UserId;
+   createdAt: Timestamp;
+   id: CommentId;
+   postId: PostId;
+   "text": text;
+ };
+service : {
+  _immutableObjectStorageBlobsAreLive: (hashes: vec blob) -> (vec bool) query;
+  _immutableObjectStorageBlobsToDelete: () -> (vec blob) query;
+  _immutableObjectStorageConfirmBlobDeletion: (blobs: vec blob) -> ();
+  _immutableObjectStorageCreateCertificate: (blobHash: text) ->
+   (_ImmutableObjectStorageCreateCertificateResult);
+  _immutableObjectStorageRefillCashier: (refillInformation:
+   opt _ImmutableObjectStorageRefillInformation) ->
+   (_ImmutableObjectStorageRefillResult);
+  _immutableObjectStorageUpdateGatewayPrincipals: () -> ();
+  _initializeAccessControl: () -> ();
+  addComment: (postId: PostId, "text": text) -> (Comment);
+  approveFollowRequest: (requesterId: UserId) -> (bool);
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  createPost: (input: PostInput) -> (Post);
+  declineFollowRequest: (requesterId: UserId) -> (bool);
+  deleteComment: (postId: PostId, commentId: CommentId) -> (bool);
+  deletePost: (postId: PostId) -> (bool);
+  followUser: (target: UserId) -> (bool);
+  getCallerProfile: () -> (opt Profile) query;
+  getCallerUserProfile: () -> (opt UserProfile) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getConversation: (withUser: UserId, limit: nat, offset: nat) ->
+   (vec DirectMessageView) query;
+  getExploreFeed: (offset: nat, limit: nat) -> (Page_1) query;
+  getFollowerProfiles: (user: UserId, offset: nat, limit: nat) ->
+   (Page) query;
+  getFollowers: (user: UserId, offset: nat, limit: nat) -> (Page_4) query;
+  getFollowing: (user: UserId, offset: nat, limit: nat) -> (Page_4) query;
+  getFollowingProfiles: (user: UserId, offset: nat, limit: nat) ->
+   (Page) query;
+  getHomeFeed: (offset: nat, limit: nat) -> (Page_1) query;
+  getMyFollowRequests: () -> (vec FollowRequest) query;
+  getNotifications: (offset: nat, limit: nat) -> (Page_3) query;
+  getPendingRequestCount: () -> (nat) query;
+  getPost: (postId: PostId) -> (opt Post) query;
+  getProfile: (user: UserId) -> (opt Profile) query;
+  getRequestStatus: (targetId: UserId) -> (opt FollowRequestStatus) query;
+  getSuggestedUsersWithFollowing: (offset: nat, limit: nat) -> (Page) query;
+  getUnreadMessageCount: () -> (nat) query;
+  getUnreadNotificationCount: () -> (nat) query;
+  getUserProfile: (user: UserId) -> (opt Profile) query;
+  isCallerAdmin: () -> (bool) query;
+  isFollowing: (target: UserId) -> (bool) query;
+  isLiked: (postId: PostId) -> (bool) query;
+  listComments: (postId: PostId, offset: nat, limit: nat) -> (Page_2) query;
+  listConversations: () -> (vec ConversationPreview) query;
+  listPostsByAuthor: (author: UserId, offset: nat, limit: nat) ->
+   (Page_1) query;
+  markAllNotificationsRead: () -> ();
+  markConversationRead: (partner: UserId) -> ();
+  markNotificationRead: (notifId: NotificationId) -> (bool);
+  registerUser: (input: ProfileInput) -> ();
+  saveCallerUserProfile: (profile: UserProfile) -> ();
+  searchUsers: (queryText: text, offset: nat, limit: nat) -> (Page) query;
+  sendFollowRequest: (to: UserId) -> (bool);
+  sendMessage: (to: UserId, "text": text) -> (bool);
+  toggleLike: (postId: PostId) -> (bool);
+  unfollowUser: (target: UserId) -> (bool);
+  updateCallerProfile: (input: ProfileInput) -> ();
+  updateCaption: (postId: PostId, newCaption: text) -> (bool);
+}
